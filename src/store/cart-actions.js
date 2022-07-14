@@ -2,6 +2,7 @@
 import {uiActions} from './ui-slice';
 import {cartActions} from './cart-slice';
 
+//Custom Action Creator 
 // fetch the stored cart data from the backend adn return it as a json object 
 export const fetchCartData = () => {
     return async (dispatch) => {
