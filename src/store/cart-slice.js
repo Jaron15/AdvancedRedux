@@ -6,6 +6,7 @@ const cartSlice = createSlice({
     initialState: {
         items: [],
         totalQuantity: 0,
+        changed: false
     },
     reducers: {
         replaceCart(state, action)  {
@@ -16,6 +17,7 @@ const cartSlice = createSlice({
             const newItem = action.payload;
             const existingItem = state.items.find(item => item.id === newItem.id);
             state.totalQuantity++;
+            state.changed = true;
 //if the item is not in cart add a new item object 
             if (!existingItem) {
                 state.items.push({
@@ -37,7 +39,8 @@ const cartSlice = createSlice({
             const id = action.payload;
 //find the existing item where its ID matches the id being grabbed from the payload ^
             const existingItem = state.items.find(item => item.id === id);
-            state.quantity--;
+            state.totalQuantity--;
+            state.changed = true;
 //if there is only one of the item in question then filter it out
             if (existingItem.quantity === 1) {
 //this filter will return only the items that have an id that doesnt match the id in question

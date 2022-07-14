@@ -20,7 +20,12 @@ export const fetchCartData = () => {
 //then use the replaceCart action from cartActions to set the cart data
         try {
            const cartData = await fetchData();
-           dispatch(cartActions.replaceCart(cartData));
+//instead of sending just cart we make sure that there are items and qty properties in the backend
+//so that there is not an undefined property when all items are removed because this will cause an error
+           dispatch(cartActions.replaceCart({
+            items: cartData.items || [],
+            totalQuantity: cartData.totalQuantity,
+           }));
         } catch (error) {
             dispatch(uiActions.showNotification({
                 status: 'error',
@@ -49,7 +54,10 @@ export const sendCartData = (cart) => {
         //fetch data
           const response = await fetch('https://react-http-312f4-default-rtdb.firebaseio.com/cart.json', {
             method: 'PUT',
-            body: JSON.stringify(cart)
+            body: JSON.stringify({
+                items: cart.items,
+                totalQuantity:cart.totalQuantity,
+            })
           })
         
         
