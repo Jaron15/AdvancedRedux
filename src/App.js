@@ -3,8 +3,9 @@ import Layout from './components/Layout/Layout';
 import Products from './components/Shop/Products';
 import {useSelector, useDispatch} from  'react-redux';
 import {useEffect, Fragment} from 'react';
-import {uiActions} from './store/ui-slice';
 import Notification from './components/UI/Notification';
+
+import {sendCartData} from './store/cart-slice';
 
 let isInitial = true;
 
@@ -21,48 +22,13 @@ const notification = useSelector(state => state.ui.notification);
 //this can not be done within a reducer bc a reducer can not contain async code or any kind of effects
 //so this effect that takes data from a reducer, but must be put in a different component to complete the fetch operation (App was chosen randomly you could have put this effect in cart.js for example)
 useEffect(() => {
-  const sendCartData = async () => {
-// the dispatch functions set the showNotification state with title status and message properties
-//this first one is pending and is called before the fetch runs so that the user gets a notification that it got their request
-    dispatch(uiActions.showNotification({
-      status: 'pending',
-      title: 'Sending',
-      message: 'Sending cart data!'
-    }))
-//fetch data
-  const response = await fetch('https://react-http-312f4-default-rtdb.firebaseio.com/cart.json', {
-    method: 'PUT',
-    body: JSON.stringify(cart)
-  })
-
-
-if (!response.ok) {
-  throw new Error('Sending cart data failed.')
+ //check to see if this is the initial render because you dont want to send empty cart data for no reason 
+ if (isInitial) {
+  isInitial = false;
+  return;
 }
 
-//if there is no error set the notification state to success 
-dispatch(uiActions.showNotification({
-  status: 'success',
-  title: 'Success!',
-  message: 'Sent cart data successfully!'
-}))
-  };
-
-//check to see if this is the initial render because you dont want to send empty cart data for no reason 
-  if (isInitial) {
-    isInitial = false;
-    return;
-  }
-//run the function defined above with a catch block that will run another 
-//notification dispatch to set the notification state to error 
-sendCartData().catch(error => {
-  dispatch(uiActions.showNotification({
-    status: 'error',
-    title: 'Error!',
-    message: 'Sending cart data failed!'
-  }))
-})
-
+dispatch(sendCartData(cart))
 }, [cart, dispatch])
 
 

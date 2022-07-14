@@ -1,5 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 
+import {uiActions} from './ui-slice';
+
 const cartSlice = createSlice({
     name: 'cart',
     initialState: {
@@ -45,6 +47,53 @@ const cartSlice = createSlice({
         }
     }
 });
+
+
+//Custom Action Creator 
+//function that returns another function so that you can use async code 
+export const sendCartData = (cart) => {
+    return async (dispatch) => {
+// the dispatch functions set the showNotification state with title status and message properties
+//this first one is pending and is called before the fetch runs so that the user gets a notification that it got their request
+    dispatch(
+    uiActions.showNotification({
+        status: 'pending',
+        title: 'Sending',
+        message: 'Sending cart data!'
+        })
+    );
+
+    const sendRequest = async () => {
+        //fetch data
+          const response = await fetch('https://react-http-312f4-default-rtdb.firebaseio.com/cart.json', {
+            method: 'PUT',
+            body: JSON.stringify(cart)
+          })
+        
+        
+        if (!response.ok) {
+          throw new Error('Sending cart data failed.')
+        }
+    }
+
+    try {
+    await sendRequest();
+    //if there is no error set the notification state to success 
+    dispatch(uiActions.showNotification({
+        status: 'success',
+        title: 'Success!',
+        message: 'Sent cart data successfully!'
+      }))
+    } catch (error) {
+    dispatch(uiActions.showNotification({
+        status: 'error',
+        title: 'Error!',
+        message: 'Sending cart data failed!'
+        }))
+    }
+    };
+    }
+
 
 export const cartActions = cartSlice.actions;
 export default cartSlice;
