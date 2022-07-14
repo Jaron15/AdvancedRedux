@@ -5,7 +5,7 @@ import {useSelector, useDispatch} from  'react-redux';
 import {useEffect, Fragment} from 'react';
 import Notification from './components/UI/Notification';
 
-import {sendCartData} from './store/cart-slice';
+import {sendCartData, fetchCartData} from './store/cart-actions';
 
 let isInitial = true;
 
@@ -17,6 +17,11 @@ const showCart = useSelector(state => state.ui.cartIsVisible);
 const cart = useSelector(state => state.cart);
 //notification state slice
 const notification = useSelector(state => state.ui.notification);
+
+//dispatch[the dependency] will never change so this will only run on initial render
+useEffect(() => {
+  dispatch(fetchCartData())
+}, [dispatch])
 
 //this effect sends cart data to a backend everytime the cart state is changed
 //this can not be done within a reducer bc a reducer can not contain async code or any kind of effects
